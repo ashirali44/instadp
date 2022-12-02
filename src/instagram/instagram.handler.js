@@ -1,50 +1,62 @@
-const { readFile, writeFile, access } = require('fs/promises')
 const { IgApiClient } = require('instagram-private-api');
-const dotenv = require('dotenv');
-dotenv.config();
+const fileHandler = require('./session/validate.js');
+const account = require('./session/user.js');
+
 
 const ig = new IgApiClient();
 var searchedUsers;
 
+
 exports.adminLogin = async function (req, res) {
 
-    try {
-        ig.state.generateDevice(process.env.IG_USERNAME);
-        ig.state.proxyUrl = process.env.IG_PROXY;
-        let status = false;
-        let loginVia = '';
 
-        if (await exists()) {
+    var result = {
+        status: false,
+        type: '-'
+    }
+    try {
+       if(req.body.loginPassword=='ALIali123!'){
+        ig.state.generateDevice(account.USERNAME);
+        if (await fileHandler.existFile()) {
             try {
-                await ig.state.deserialize(await load());
+                await ig.state.deserialize(await fileHandler.loadFile());
                 await ig.account.currentUser();
-                status = true;
-                loginVia = 'Via Cookeis';
+                result.status = true;
+                result.type = 'Via Cookeis';
             } catch (e) {
+                result.status = false;
+                result.type = e;
             }
         } else {
-            loginVia = 'Via UserName Password';
-            await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD);
-            status = true;
+            await ig.account.login(account.USERNAME, account.PASSWORD);
+            result.status = true;
+            result.type = 'Via UserName Password';
         }
+        res.json(result);
+       }else{
+        result.status = false;
+        result.type = 'Wrong Password';
+        res.json(result);
 
-        res.send('Logged In - > ' + status + "  [[[[[  - " + loginVia + " - ]]]]]");
+       }
+
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send({ error: 'Problem fetching books.' });
+        result.status = false;
+        result.type = e;
     }
+
+
 }
 
 exports.fetchUserData = async function (req, res) {
 
     try {
 
-        ig.state.generateDevice(process.env.IG_USERNAME);
-        ig.state.proxyUrl = process.env.IG_PROXY;
+        ig.state.generateDevice(account.USERNAME);
 
-        if (await exists()) {
+        if (await fileHandler.existFile()) {
             try {
-                await ig.state.deserialize(await load());
+                await ig.state.deserialize(await loadFile());
                 await ig.account.currentUser();
                 console.log('Picking From Cookies');
                 searchedUsers = (await ig.user.info(
@@ -54,7 +66,7 @@ exports.fetchUserData = async function (req, res) {
             }
         } else {
             console.log('Currently Logging');
-            await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD);
+            await ig.account.login(account.USERNAME, account.PASSWORD);
             searchedUsers = (await ig.user.info(
                 await ig.user.getIdByUsername(req.query.username))
             );
@@ -68,24 +80,9 @@ exports.fetchUserData = async function (req, res) {
     }
 }
 
-
-
-function save(state) {
-    writeFile('temp.txt', state).catch(console.error);
-}
-
-async function load() {
-    const rawState = await readFile('temp.txt');
-    return JSON.parse(rawState);
-}
-
 ig.request.end$.subscribe(async () => {
     const serialized = await ig.state.serialize();
     delete serialized.constants;
     const data = JSON.stringify(serialized);
-    save(data);
+    fileHandler.saveFile(data);
 });
-
-function exists() {
-    return access('temp.txt').then(() => true).catch(() => false);
-}

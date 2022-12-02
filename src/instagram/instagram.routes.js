@@ -3,7 +3,7 @@ const instagramRoutes = express.Router();
 
 const instagramHandlers = require('./instagram.handler');
 
-instagramRoutes.get('/adminLogin', instagramHandlers.adminLogin);
+instagramRoutes.post('/adminlogin', instagramHandlers.adminLogin);
 instagramRoutes.get('/fetchUserDetails', instagramHandlers.fetchUserData);
 
 module.exports = instagramRoutes;
