@@ -18,6 +18,7 @@ exports.adminLogin = async function (req, res) {
        if(req.body.loginPassword=='ALIali123!'){
         ig.state.generateDevice(account.USERNAME);
         if (await fileHandler.existFile()) {
+            console.log('Logging In Via COOKIES');
             try {
                 await ig.state.deserialize(await fileHandler.loadFile());
                 await ig.account.currentUser();
@@ -29,6 +30,7 @@ exports.adminLogin = async function (req, res) {
             }
         } else {
             await ig.account.login(account.USERNAME, account.PASSWORD);
+            console.log('Logging In Via ID-PASS');
             result.status = true;
             result.type = 'Via UserName Password';
         }
@@ -37,6 +39,7 @@ exports.adminLogin = async function (req, res) {
         result.status = false;
         result.type = 'Wrong Password';
         res.json(result);
+    
 
        }
 
@@ -53,19 +56,18 @@ exports.fetchUserData = async function (req, res) {
     try {
 
         ig.state.generateDevice(account.USERNAME);
-
         if (await fileHandler.existFile()) {
+            console.log('VIA Cookies');
             try {
-                await ig.state.deserialize(await loadFile());
+                await ig.state.deserialize(await fileHandler.loadFile());
                 await ig.account.currentUser();
-                console.log('Picking From Cookies');
                 searchedUsers = (await ig.user.info(
                     await ig.user.getIdByUsername(req.query.username))
                 );
             } catch (e) {
             }
         } else {
-            console.log('Currently Logging');
+            console.log('Via ID-PASS');
             await ig.account.login(account.USERNAME, account.PASSWORD);
             searchedUsers = (await ig.user.info(
                 await ig.user.getIdByUsername(req.query.username))
