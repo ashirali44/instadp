@@ -1,5 +1,5 @@
-const USERNAME = 'haiderali99911';
-const PASSWORD = 'ALIali123';
+const USERNAME = 'ahki5887';
+const PASSWORD = 'ALIali899';
 
 
 module.exports = {
