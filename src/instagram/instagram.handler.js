@@ -1,6 +1,9 @@
 const { IgApiClient } = require('instagram-private-api');
 const fileHandler = require('./session/validate.js');
 const account = require('./session/user.js');
+const urlHandlerInstagram = require('instagram-id-to-url-segment');
+const fetchMediaResponseHandler = require('./session/mediaFetch.js');
+
 
 
 const ig = new IgApiClient();
@@ -15,33 +18,33 @@ exports.adminLogin = async function (req, res) {
         type: '-'
     }
     try {
-       if(req.body.loginPassword=='ALIali123!'){
-        ig.state.generateDevice(account.USERNAME);
-        if (await fileHandler.existFile()) {
-            console.log('Logging In Via COOKIES');
-            try {
-                await ig.state.deserialize(await fileHandler.loadFile());
-                await ig.account.currentUser();
+        if (req.body.loginPassword == 'ALIali123!') {
+            ig.state.generateDevice(account.USERNAME);
+            if (await fileHandler.existFile()) {
+                console.log('Logging In Via COOKIES');
+                try {
+                    await ig.state.deserialize(await fileHandler.loadFile());
+                    await ig.account.currentUser();
+                    result.status = true;
+                    result.type = 'Via Cookeis';
+                } catch (e) {
+                    result.status = false;
+                    result.type = e;
+                }
+            } else {
+                await ig.account.login(account.USERNAME, account.PASSWORD);
+                console.log('Logging In Via ID-PASS');
                 result.status = true;
-                result.type = 'Via Cookeis';
-            } catch (e) {
-                result.status = false;
-                result.type = e;
+                result.type = 'Via UserName Password';
             }
+            res.json(result);
         } else {
-            await ig.account.login(account.USERNAME, account.PASSWORD);
-            console.log('Logging In Via ID-PASS');
-            result.status = true;
-            result.type = 'Via UserName Password';
-        }
-        res.json(result);
-       }else{
-        result.status = false;
-        result.type = 'Wrong Password';
-        res.json(result);
-    
+            result.status = false;
+            result.type = 'Wrong Password';
+            res.json(result);
 
-       }
+
+        }
 
     } catch (e) {
         result.status = false;
@@ -76,6 +79,37 @@ exports.fetchUserData = async function (req, res) {
 
         res.send(searchedUsers);
 
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send({ error: 'Problem fetching books.' });
+    }
+}
+
+exports.fetchMediaData = async function (req, res) {
+    var mediadata;
+    var data;
+    try {
+
+        ig.state.generateDevice(account.USERNAME);
+        if (await fileHandler.existFile()) {
+
+            console.log('VIA Cookies');
+            try {
+                var id = urlHandlerInstagram.urlSegmentToInstagramId(req.query.id);
+                console.log(id);
+                await ig.state.deserialize(await fileHandler.loadFile());
+                await ig.account.currentUser();
+                mediadata = await ig.media.info(id);
+                data = fetchMediaResponseHandler.fetchMediaResponse(mediadata);
+            } catch (e) {
+                console.log(e);
+                data = e;
+            }
+            res.json(data);
+
+        } else {
+            console.log('No Cookies Exist');
+        }
     } catch (e) {
         console.log(e.message)
         res.status(500).send({ error: 'Problem fetching books.' });
