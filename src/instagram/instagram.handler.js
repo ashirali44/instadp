@@ -94,8 +94,15 @@ exports.fetchUserData = async function (req, res) {
 }
 
 exports.fetchMediaData = async function (req, res) {
+    var mediatempid;
+    const b = Buffer.from(req.query.id);
 
-    var mediatempid = betweenMarkers("/p","/",req.query.id);;
+    if(b.includes('reel')){
+         mediatempid = betweenMarkers("/reel","/",req.query.id);
+    }else{
+        mediatempid = betweenMarkers("/p","/",req.query.id);
+    }
+
     var mediadata;
     var data;
     try {
@@ -115,7 +122,7 @@ exports.fetchMediaData = async function (req, res) {
                 console.log(e);
                 data = e;
             }
-            res.json(data);
+            res.json(mediadata);
 
         } else {
             console.log('No Cookies Exist');
