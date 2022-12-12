@@ -65,7 +65,7 @@ exports.fetchUserData = async function (req, res) {
     
     let requestedUsername = '';
     const rx = /^(?:@|(?:https?:\/\/)?(?:www\.)?instagr(?:\.am|am\.com)\/)?(\w+)\/?$/
-    let match = rx.exec(input) 
+    let match = rx.exec(req.query.username) 
     if (match) {
         requestedUsername = match[1];
     }
