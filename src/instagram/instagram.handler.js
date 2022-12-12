@@ -122,7 +122,7 @@ exports.fetchMediaData = async function (req, res) {
                 console.log(e);
                 data = e;
             }
-            res.json(mediadata);
+            res.json(data);
 
         } else {
             console.log('No Cookies Exist');
