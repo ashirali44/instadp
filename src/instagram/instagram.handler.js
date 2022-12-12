@@ -62,6 +62,13 @@ exports.adminLogin = async function (req, res) {
 }
 
 exports.fetchUserData = async function (req, res) {
+    
+    let requestedUsername = '';
+    const rx = /^(?:@|(?:https?:\/\/)?(?:www\.)?instagr(?:\.am|am\.com)\/)?(\w+)\/?$/
+    let match = rx.exec(input) 
+    if (match) {
+        requestedUsername = match[1];
+    }
 
     try {
 
@@ -72,17 +79,11 @@ exports.fetchUserData = async function (req, res) {
                 await ig.state.deserialize(await fileHandler.loadFile());
                 await ig.account.currentUser();
                 searchedUsers = (await ig.user.info(
-                    await ig.user.getIdByUsername(req.query.username))
+                    await ig.user.getIdByUsername(requestedUsername))
                 );
             } catch (e) {
             }
-        } else {
-            console.log('Via ID-PASS');
-            await ig.account.login(account.USERNAME, account.PASSWORD);
-            searchedUsers = (await ig.user.info(
-                await ig.user.getIdByUsername(req.query.username))
-            );
-        }
+        } 
 
         res.send(searchedUsers);
 
