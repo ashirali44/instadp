@@ -12,7 +12,8 @@ var searchedUsers;
 
 exports.adminLogin = async function (req, res) {
 
-
+   var status = fileHandler.deleteFile();
+   if(!status){
     var result = {
         status: false,
         type: '-'
@@ -50,7 +51,13 @@ exports.adminLogin = async function (req, res) {
         result.status = false;
         result.type = e;
     }
-
+   }else{
+    var result = {
+        status: false,
+        type: 'Unable to Delete File'
+    }
+    res.json(result); 
+   }
 
 }
 
