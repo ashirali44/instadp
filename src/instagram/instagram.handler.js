@@ -94,6 +94,8 @@ exports.fetchUserData = async function (req, res) {
 }
 
 exports.fetchMediaData = async function (req, res) {
+
+    var mediatempid = betweenMarkers("/p","/",req.query.id);;
     var mediadata;
     var data;
     try {
@@ -103,7 +105,7 @@ exports.fetchMediaData = async function (req, res) {
 
             console.log('VIA Cookies');
             try {
-                var id = urlHandlerInstagram.urlSegmentToInstagramId(req.query.id);
+                var id = urlHandlerInstagram.urlSegmentToInstagramId(mediatempid);
                 console.log(id);
                 await ig.state.deserialize(await fileHandler.loadFile());
                 await ig.account.currentUser();
@@ -130,3 +132,12 @@ ig.request.end$.subscribe(async () => {
     const data = JSON.stringify(serialized);
     fileHandler.saveFile(data);
 });
+
+
+function betweenMarkers( begin, end, originalText) {
+    var buf = Buffer.from(originalText);
+    var firstChar = buf.indexOf(begin) + begin.length +1;
+    var lastChar = buf.lastIndexOf(end);
+    var newText = originalText.substring(firstChar, lastChar);
+    return newText;
+  }
