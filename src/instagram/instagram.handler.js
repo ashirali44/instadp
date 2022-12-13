@@ -66,7 +66,6 @@ exports.fetchUserData = async function (req, res) {
             console.log('VIA Cookies');
             try {
                 await ig.state.deserialize(await fileHandler.loadFile());
-                await ig.account.currentUser();
                 searchedUsers = (await ig.user.info(
                     await ig.user.getIdByUsername(requestedUsername))
                 );
@@ -105,7 +104,6 @@ exports.fetchMediaData = async function (req, res) {
                 var id = urlHandlerInstagram.urlSegmentToInstagramId(mediatempid);
                 console.log(id);
                 await ig.state.deserialize(await fileHandler.loadFile());
-                await ig.account.currentUser();
                 mediadata = await ig.media.info(id);
                 data = fetchMediaResponseHandler.fetchMediaResponse(mediadata);
             } catch (e) {
