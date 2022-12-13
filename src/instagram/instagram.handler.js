@@ -39,6 +39,7 @@ exports.adminLogin = async function (req, res) {
     } catch (e) {
         result.status = false;
         result.type = e;
+        console.log(e);
     }
    }else{
     var result = {
@@ -58,7 +59,6 @@ exports.fetchUserData = async function (req, res) {
     if (match) {
         requestedUsername = match[1];
     }
-
     try {
 
         ig.state.generateDevice(account.USERNAME);
@@ -71,6 +71,7 @@ exports.fetchUserData = async function (req, res) {
                     await ig.user.getIdByUsername(requestedUsername))
                 );
             } catch (e) {
+                console.log(e);
             }
         } 
 
