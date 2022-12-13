@@ -21,23 +21,12 @@ exports.adminLogin = async function (req, res) {
     try {
         if (req.body.loginPassword == 'ALIali123!') {
             ig.state.generateDevice(account.USERNAME);
-            if (await fileHandler.existFile()) {
-                console.log('Logging In Via COOKIES');
-                try {
-                    await ig.state.deserialize(await fileHandler.loadFile());
-                    await ig.account.currentUser();
-                    result.status = true;
-                    result.type = 'Via Cookeis';
-                } catch (e) {
-                    result.status = false;
-                    result.type = e;
-                }
-            } else {
+           
                 await ig.account.login(account.USERNAME, account.PASSWORD);
                 console.log('Logging In Via ID-PASS');
                 result.status = true;
                 result.type = 'Via UserName Password';
-            }
+            
             res.json(result);
         } else {
             result.status = false;
