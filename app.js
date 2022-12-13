@@ -4,7 +4,6 @@ const instaRotues = require('./src/instagram');
 
 const app = express()
 // Listen on a specific host via the HOST environment variable
-var host = process.env.HOST || '18.141.210.93';
 // Listen on a specific port via the PORT environment variable
 var port = process.env.PORT || 80;
 
