@@ -63,36 +63,35 @@ exports.fetchUserData = async function (req, res) {
             console.log(requestedUsername);
         }
     } 
-    // try {
+    try {
 
-    //     ig.state.generateDevice(account.USERNAME);
-    //     if (await fileHandler.existFile()) {
-    //         console.log('VIA Cookies');
-    //         try {
-    //             await ig.state.deserialize(await fileHandler.loadFile());
-    //             searchedUsers = (await ig.user.info(
-    //                 await ig.user.getIdByUsername(requestedUsername))
-    //             );
+        ig.state.generateDevice(account.USERNAME);
+        if (await fileHandler.existFile()) {
+            console.log('VIA Cookies');
+            try {
+                await ig.state.deserialize(await fileHandler.loadFile());
+                searchedUsers = (await ig.user.info(
+                    await ig.user.getIdByUsername(requestedUsername))
+                );
 
-    //         } catch (e) {
+            } catch (e) {
 
-    //                 console.log(e);
-    //                 searchedUsers = {
-    //                     error: errorOccurred,
-    //                     message: "Unable to Find the requested Profile",
-    //                     exception: e.toString()
-    //                 }
+                    console.log(e);
+                    searchedUsers = {
+                        error: errorOccurred,
+                        message: "Unable to Find the requested Profile",
+                        exception: e.toString()
+                    }
 
-    //         }
-    //     }
+            }
+        }
 
-    //     res.send(searchedUsers);
+        res.send(searchedUsers);
 
-    // } catch (e) {
-    //     console.log(e.message)
-    //     res.status(500).send({ error: 'Problem fetching books.' });
-    // }
-    res.send(requestedUsername);
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send({ error: 'Problem fetching books.' });
+    }
 }
 
 exports.fetchMediaData = async function (req, res) {
