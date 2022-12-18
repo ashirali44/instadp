@@ -7,7 +7,6 @@ const fetchMediaResponseHandler = require('./session/mediaFetch.js');
 
 
 const ig = new IgApiClient();
-var searchedUsers;
 
 
 exports.adminLogin = async function (req, res) {
@@ -52,7 +51,8 @@ exports.adminLogin = async function (req, res) {
 }
 
 exports.fetchUserData = async function (req, res) {
-    
+    var searchedUsers;
+    let errorOccurred = false;
     let requestedUsername = '';
     const rx = /^(?:@|(?:https?:\/\/)?(?:www\.)?instagr(?:\.am|am\.com)\/)?(\w+)\/?$/
     let match = rx.exec(req.query.username) 
@@ -71,6 +71,11 @@ exports.fetchUserData = async function (req, res) {
                 );
             } catch (e) {
                 console.log(e);
+                searchedUsers = {
+                    error : errorOccurred,
+                    message : "Unable to Find the requested Profile",
+                    exception : e.toString()
+                }
             }
         } 
 
