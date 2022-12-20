@@ -103,25 +103,20 @@ exports.fetchMediaData = async function (req, res) {
     try {
 
         ig.state.generateDevice(account.USERNAME);
-        if (await fileHandler.existFile()) {
-
+        if (await tryLoadSession()) {
             console.log('VIA Cookies');
-            try {
-                var id = urlHandlerInstagram.urlSegmentToInstagramId(mediatempid);
-                console.log(id);
-                await ig.state.deserialize(await fileHandler.loadFile());
-                mediadata = await ig.media.info(id);
-                data = fetchMediaResponseHandler.fetchMediaResponse(mediadata);
-            } catch (e) {
-                console.log(e);
-                data = e;
-            }
-            res.json(data);
-
         } else {
-            console.log('No Cookies Exist');
+            await ig.account.login(account.USERNAME, account.PASSWORD);
+            console.log('VIA Username Password');
         }
+        
+        var id = urlHandlerInstagram.urlSegmentToInstagramId(mediatempid);
+        mediadata = await ig.media.info(id);
+        data = fetchMediaResponseHandler.fetchMediaResponse(mediadata);
+        res.send(data);
+
     } catch (e) {
+        console.log(e);
         res.status(500).send({ error: true,
         message : e.message });
     }
