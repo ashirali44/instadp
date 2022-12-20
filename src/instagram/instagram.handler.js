@@ -50,6 +50,7 @@ exports.adminLogin = async function (req, res) {
 
 }
 
+
 exports.fetchUserData = async function (req, res) {
     var searchedUsers;
     let errorOccurred = false;
