@@ -67,25 +67,16 @@ exports.fetchUserData = async function (req, res) {
     try {
 
         ig.state.generateDevice(account.USERNAME);
-        if (await fileHandler.existFile()) {
+        if (await tryLoadSession()) {
             console.log('VIA Cookies');
-            try {
-                await ig.state.deserialize(await fileHandler.loadFile());
-                searchedUsers = (await ig.user.info(
-                    await ig.user.getIdByUsername(requestedUsername))
-                );
-
-            } catch (e) {
-
-                    console.log(e);
-                    searchedUsers = {
-                        error: errorOccurred,
-                        message: "Unable to Find the requested Profile",
-                        exception: e.toString()
-                    }
-
-            }
+        } else {
+            await ig.account.login(account.USERNAME, account.PASSWORD);
+            console.log('VIA Username Password');
         }
+
+        searchedUsers = (await ig.user.info(
+            await ig.user.getIdByUsername(requestedUsername))
+        );
 
         res.send(searchedUsers);
 
@@ -93,6 +84,8 @@ exports.fetchUserData = async function (req, res) {
         console.log(e.message)
         res.status(500).send({ error: 'Problem fetching books.' });
     }
+
+
 }
 
 exports.fetchMediaData = async function (req, res) {
@@ -148,4 +141,20 @@ function betweenMarkers(begin, end, originalText) {
     var lastChar = buf.lastIndexOf(end);
     var newText = originalText.substring(firstChar, lastChar);
     return newText;
+}
+
+
+
+
+async function tryLoadSession() {
+    if (await fileHandler.existFile()) {
+        try {
+            await ig.state.deserialize(await fileHandler.loadFile());
+            await ig.account.currentUser();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+    return false;
 }
