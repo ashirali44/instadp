@@ -81,8 +81,8 @@ exports.fetchUserData = async function (req, res) {
         res.send(searchedUsers);
 
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send({ error: 'Problem fetching books.' });
+        res.status(500).send({ error: true,
+            message : 'Instagram account not Found' });
     }
 
 
@@ -122,8 +122,8 @@ exports.fetchMediaData = async function (req, res) {
             console.log('No Cookies Exist');
         }
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send({ error: 'Problem fetching books.' });
+        res.status(500).send({ error: true,
+        message : e.message });
     }
 }
 
