@@ -81,8 +81,11 @@ exports.fetchUserData = async function (req, res) {
         res.send(searchedUsers);
 
     } catch (e) {
+        console.log(e);
         res.status(500).send({ error: true,
-            message : 'Instagram account not Found' });
+            message : 'Instagram account not Found',
+            error : e.message.toString()
+               });
     }
 
 
