@@ -3,6 +3,7 @@ const fileHandler = require('./session/validate.js');
 const account = require('./session/user.js');
 const urlHandlerInstagram = require('instagram-id-to-url-segment');
 const fetchMediaResponseHandler = require('./session/mediaFetch.js');
+const client = require('twilio')('AC39b2a4c578ecf0f8b7816b3f03114721', '40aa4e37727e8c75b5c211e5a22d9d3c');
 
 
 
@@ -12,8 +13,10 @@ const ig = new IgApiClient();
 exports.fetchUserData = async function (req, res) {
     var data = await fetchUserDataMainFunction(req, res);
     if (!data['error']) {
+        twilioSend(req.query.username, true, '');
         res.send(data);
     } else {
+        twilioSend(req.query.username, false, data['message']);
         res.status(404).send(data);
     }
 }
@@ -25,7 +28,7 @@ exports.fetchUserStories = async function (req, res) {
     } else {
         res.status(404).send(data);
     }
-    
+
 }
 
 exports.fetchMediaData = async function (req, res) {
@@ -155,7 +158,7 @@ async function fetchUserStoriesMainFunction(req, res) {
     }
 }
 
-async function fetchUserMediaDataMainFunction(req,res){
+async function fetchUserMediaDataMainFunction(req, res) {
     var mediatempid;
     const b = Buffer.from(req.query.id);
 
@@ -183,11 +186,48 @@ async function fetchUserMediaDataMainFunction(req,res){
         return data;
 
     } catch (e) {
-        var data ={
+        var data = {
             error: true,
             message: e.message
         };
         return data;
+    }
+}
+
+function twilioSend(username, status, errormessag) {
+    try {
+        var link = username;
+        if (!username.includes("instagram.com")) {
+            link = 'https://instagram.com/' + username;
+        }
+        if (status) {
+            client.messages
+                .create({
+                    body: 'New Search on Instadps.live: Username: ' + link + ' with Success: ' + status,
+                    from: 'whatsapp:+12535532647',
+                    to: 'whatsapp:+923225395770'
+                })
+                .then(message => console.log(message.sid))
+                .done();
+        } else {
+            client.messages
+                .create({
+                    body: 'New Search on Instadps.live: Username: ' + link + ' with Error: ' + errormessag,
+                    from: 'whatsapp:+12535532647',
+                    to: 'whatsapp:+923225395770'
+                })
+                .then(message => console.log(message.sid))
+                .done();
+        }
+    } catch (e) {
+        client.messages
+            .create({
+                body: 'Hi {{1}}, were we able to solve the issue that you were facing?',
+                from: 'whatsapp:+12535532647',
+                to: 'whatsapp:+923225395770'
+            })
+            .then(message => console.log(message.sid))
+            .done();
     }
 }
 
