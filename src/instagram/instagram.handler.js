@@ -4,8 +4,11 @@ const account = require('./session/user.js');
 const urlHandlerInstagram = require('instagram-id-to-url-segment');
 const fetchMediaResponseHandler = require('./session/mediaFetch.js');
 const client = require('twilio')('AC39b2a4c578ecf0f8b7816b3f03114721', '40aa4e37727e8c75b5c211e5a22d9d3c');
-
-
+const Sentry = require("@sentry/node");
+Sentry.init({
+    dsn: "https://edaf4f9d4e7042749a48db53e3838505@o4504420502732800.ingest.sentry.io/4504420506271744",
+    tracesSampleRate: 1.0,
+  });
 
 const ig = new IgApiClient();
 
@@ -112,6 +115,7 @@ async function fetchUserDataMainFunction(req, res) {
             message: 'Instagram account not Found',
             error: e.message.toString()
         };
+        Sentry.captureException(e);
         return data;
     }
 }
