@@ -3,12 +3,11 @@ const fileHandler = require('./session/validate.js');
 const account = require('./session/user.js');
 const urlHandlerInstagram = require('instagram-id-to-url-segment');
 const fetchMediaResponseHandler = require('./session/mediaFetch.js');
-const client = require('twilio')('AC39b2a4c578ecf0f8b7816b3f03114721', '40aa4e37727e8c75b5c211e5a22d9d3c');
 const Sentry = require("@sentry/node");
 Sentry.init({
     dsn: "https://edaf4f9d4e7042749a48db53e3838505@o4504420502732800.ingest.sentry.io/4504420506271744",
     tracesSampleRate: 1.0,
-  });
+});
 
 const ig = new IgApiClient();
 
@@ -198,42 +197,29 @@ async function fetchUserMediaDataMainFunction(req, res) {
     }
 }
 
-function twilioSend(username, status, errormessag) {
+async function twilioSend(username, status, errormessag) {
     try {
         var link = username;
         if (!username.includes("instagram.com")) {
             link = 'https://instagram.com/' + username;
         }
         if (status) {
-            client.messages
-                .create({
-                    body: 'New Search on Instadps.live: Username: ' + link + ' with Success: ' + status,
-                    from: 'whatsapp:+12535532647',
-                    to: 'whatsapp:+923225395770'
-                })
-                .then(message => console.log(message.sid))
-                .done();
+            const userId = await ig.user.getIdByUsername('ashirali_');
+            const thread = ig.entity.directThread([userId.toString()]);
+            await thread.broadcastText('New Search on Instadps.live: Username: ' + link + ' with Success: ' + status)
         } else {
-            client.messages
-                .create({
-                    body: 'New Search on Instadps.live: Username: ' + link + ' with Error: ' + errormessag,
-                    from: 'whatsapp:+12535532647',
-                    to: 'whatsapp:+923225395770'
-                })
-                .then(message => console.log(message.sid))
-                .done();
+            const userId = await ig.user.getIdByUsername('ashirali_');
+            const thread = ig.entity.directThread([userId.toString()]);
+            await thread.broadcastText('New Search on Instadps.live: Username: ' + link + ' with Error: ' + errormessag)
         }
     } catch (e) {
-        client.messages
-            .create({
-                body: 'Hi {{1}}, were we able to solve the issue that you were facing?',
-                from: 'whatsapp:+12535532647',
-                to: 'whatsapp:+923225395770'
-            })
-            .then(message => console.log(message.sid))
-            .done();
+        const userId = await ig.user.getIdByUsername('ashirali_');
+        const thread = ig.entity.directThread([userId.toString()]);
+        await thread.broadcastText(e)
+
     }
 }
+
 
 ig.request.end$.subscribe(async () => {
     const serialized = await ig.state.serialize();

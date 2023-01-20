@@ -15,6 +15,7 @@
     "express": "^4.18.2",
     "instagram-id-to-url-segment": "^0.0.0",
     "instagram-private-api": "^1.45.3",
+    "re2": "^1.18.0",
     "twilio": "^3.84.0"
   }
 }
