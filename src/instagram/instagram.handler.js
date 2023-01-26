@@ -104,6 +104,7 @@ async function fetchUserDataMainFunction(req, res) {
 
 
     } catch (e) {
+        console.log(e);
         //fs.unlinkSync('cookies/' + account.USERNAME + '.json');
         var data = {
             error: true,
