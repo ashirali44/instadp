@@ -96,13 +96,12 @@ async function fetchUserDataMainFunction(req, res) {
         }
     }
     try {
-        ig.state.generateDevice(account.USERNAME);
-        if (await tryLoadSession()) {
-            searchedUsers = (await ig.user.info(
-                await ig.user.getIdByUsername(requestedUsername))
-            );
-            return searchedUsers;
-        }
+        await tryLoadSession()
+        searchedUsers = (await ig.user.info(
+            await ig.user.getIdByUsername(requestedUsername))
+        );
+        return searchedUsers;
+
 
     } catch (e) {
         //fs.unlinkSync('cookies/' + account.USERNAME + '.json');
@@ -174,7 +173,6 @@ async function fetchUserMediaDataMainFunction(req, res) {
     var data;
     try {
 
-        ig.state.generateDevice(account.USERNAME);
         if (await tryLoadSession()) {
             console.log('VIA Cookies');
         } else {
@@ -208,14 +206,18 @@ function betweenMarkers(begin, end, originalText) {
 
 async function tryLoadSession() {
     try {
+        ig.state.generateDevice(account.USERNAME);
+
         if (fs.existsSync('cookies/' + account.USERNAME + '.json')) {
             let data = fs.readFileSync('cookies/' + account.USERNAME + '.json', { encoding: 'utf-8' });
             ig.request.setHeaders(JSON.parse(data), account.USERNAME);
+            return true;
         } else {
             console.log('not exists');
             await ig.account.login(account.USERNAME, account.PASSWORD);
             let data = ig.request.getDefaultHeaders();
-            await fs.writeFileSync('cookies/' + account.USERNAME + '.json', JSON.stringify(data), { encoding: 'utf-8' });
+            fs.writeFileSync('cookies/' + account.USERNAME + '.json', JSON.stringify(data), { encoding: 'utf-8' });
+            return true;
         }
     } catch (e) {
         console.log(e);
