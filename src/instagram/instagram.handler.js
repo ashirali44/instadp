@@ -4,6 +4,8 @@ const account = require('./session/user.js');
 const urlHandlerInstagram = require('instagram-id-to-url-segment');
 const fetchMediaResponseHandler = require('./session/mediaFetch.js');
 const Sentry = require("@sentry/node");
+const fs = require('fs');
+
 Sentry.init({
     dsn: "https://edaf4f9d4e7042749a48db53e3838505@o4504420502732800.ingest.sentry.io/4504420506271744",
     tracesSampleRate: 1.0,
@@ -94,21 +96,16 @@ async function fetchUserDataMainFunction(req, res) {
         }
     }
     try {
-
         ig.state.generateDevice(account.USERNAME);
         if (await tryLoadSession()) {
-            console.log('VIA Cookies');
-        } else {
-            await ig.account.login(account.USERNAME, account.PASSWORD);
-            console.log('VIA Username Password');
+            searchedUsers = (await ig.user.info(
+                await ig.user.getIdByUsername(requestedUsername))
+            );
+            return searchedUsers;
         }
 
-        searchedUsers = (await ig.user.info(
-            await ig.user.getIdByUsername(requestedUsername))
-        );
-        return searchedUsers;
-
     } catch (e) {
+        //fs.unlinkSync('cookies/' + account.USERNAME + '.json');
         var data = {
             error: true,
             message: 'Instagram account not Found',
@@ -116,6 +113,8 @@ async function fetchUserDataMainFunction(req, res) {
         };
         Sentry.captureException(e);
         return data;
+
+
     }
 }
 
@@ -197,6 +196,35 @@ async function fetchUserMediaDataMainFunction(req, res) {
     }
 }
 
+
+
+function betweenMarkers(begin, end, originalText) {
+    var buf = Buffer.from(originalText);
+    var firstChar = buf.indexOf(begin) + begin.length + 1;
+    var lastChar = buf.lastIndexOf(end);
+    var newText = originalText.substring(firstChar, lastChar);
+    return newText;
+}
+
+async function tryLoadSession() {
+    try {
+        if (fs.existsSync('cookies/' + account.USERNAME + '.json')) {
+            let data = fs.readFileSync('cookies/' + account.USERNAME + '.json', { encoding: 'utf-8' });
+            ig.request.setHeaders(JSON.parse(data), account.USERNAME);
+        } else {
+            console.log('not exists');
+            await ig.account.login(account.USERNAME, account.PASSWORD);
+            let data = ig.request.getDefaultHeaders();
+            await fs.writeFileSync('cookies/' + account.USERNAME + '.json', JSON.stringify(data), { encoding: 'utf-8' });
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return true;
+}
+
+
+
 async function twilioSend(username, status, errormessag) {
     try {
         var link = username;
@@ -218,33 +246,4 @@ async function twilioSend(username, status, errormessag) {
         await thread.broadcastText(e)
 
     }
-}
-
-
-ig.request.end$.subscribe(async () => {
-    const serialized = await ig.state.serialize();
-    delete serialized.constants;
-    const data = JSON.stringify(serialized);
-    fileHandler.saveFile(data);
-});
-
-function betweenMarkers(begin, end, originalText) {
-    var buf = Buffer.from(originalText);
-    var firstChar = buf.indexOf(begin) + begin.length + 1;
-    var lastChar = buf.lastIndexOf(end);
-    var newText = originalText.substring(firstChar, lastChar);
-    return newText;
-}
-
-async function tryLoadSession() {
-    if (await fileHandler.existFile()) {
-        try {
-            await ig.state.deserialize(await fileHandler.loadFile());
-            await ig.account.currentUser();
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-    return false;
 }
