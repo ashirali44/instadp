@@ -23,6 +23,8 @@ exports.fetch = async function (req, res) {
         data: null
     };
     const b = Buffer.from(req.query.userquery);
+   // ig.state.proxyUrl = 'http://3lDQJELEO4gBRIlImofWpg@smartproxy.crawlbase.com:8012';
+
     await CheckInstaSession();
 
     if (!b.includes('/reel/') && !b.includes('/p/')) {
@@ -62,17 +64,7 @@ async function CheckInstaSession() {
             ig.request.setHeaders(JSON.parse(data), account.USERNAME);
             return true;
         } else {
-            console.log('not exists');
-            ig.request.defaults.agentOptions = {
-                hostname: 'smartproxy.crawlbase.com', // proxy hostname
-                port: 8012, // proxy port
-                headers: {
-                    'Proxy-Authorization': '3lDQJELEO4gBRIlImofWpg',
-                    // 'crawlbaseAPI-Parameters': 'javascript=true' // Send the javascript param if you need to do requests using headless browsers.
-                  },
-                  protocol: 'socks:',
-                 
-            };
+           console.log('not exists');
             await ig.account.login(account.USERNAME, account.PASSWORD);
             let data = ig.request.getDefaultHeaders();
             fs.writeFileSync('cookies/' + account.USERNAME + '.json', JSON.stringify(data), { encoding: 'utf-8' });
