@@ -63,12 +63,15 @@ async function CheckInstaSession() {
             return true;
         } else {
             console.log('not exists');
-            ig.request.defaults.agentClass = shttps; // apply agent class to request library defaults
             ig.request.defaults.agentOptions = {
-                hostname: smartproxy.crawlbase.com, // proxy hostname
+                hostname: 'smartproxy.crawlbase.com', // proxy hostname
                 port: 8012, // proxy port
-                protocol: 'socks:',
-                bearer : '3lDQJELEO4gBRIlImofWpg'
+                headers: {
+                    'Proxy-Authorization': '3lDQJELEO4gBRIlImofWpg',
+                    // 'crawlbaseAPI-Parameters': 'javascript=true' // Send the javascript param if you need to do requests using headless browsers.
+                  },
+                  protocol: 'socks:',
+                 
             };
             await ig.account.login(account.USERNAME, account.PASSWORD);
             let data = ig.request.getDefaultHeaders();
