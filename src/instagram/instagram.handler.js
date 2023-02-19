@@ -5,11 +5,8 @@ const UtilsApp = require('./modules/utils.js');
 const account = require('./modules/user_details.js');
 const fs = require('fs');
 const Sentry = require("@sentry/node");
+const fileHandler = require('./modules/validate.js');
 
-Sentry.init({
-    dsn: "https://edaf4f9d4e7042749a48db53e3838505@o4504420502732800.ingest.sentry.io/4504420506271744",
-    tracesSampleRate: 1.0,
-});
 
 
 const ig = new IgApiClient();
@@ -23,9 +20,14 @@ exports.fetch = async function (req, res) {
         data: null
     };
     const b = Buffer.from(req.query.userquery);
-   // ig.state.proxyUrl = 'http://3lDQJELEO4gBRIlImofWpg@smartproxy.crawlbase.com:8012';
-
-    await CheckInstaSession();
+    
+    ig.state.generateDevice(account.USERNAME);
+    if (await tryLoadSession()) {
+        console.log('VIA Cookies');
+    } else {
+        await ig.account.login(account.USERNAME, account.PASSWORD);
+        console.log('VIA Username Password');
+    }
 
     if (!b.includes('/reel/') && !b.includes('/p/')) {
         if (req.query.story == null || req.query.story == 'false') {
@@ -55,26 +57,22 @@ exports.fetch = async function (req, res) {
     }
 }
 
+ig.request.end$.subscribe(async () => {
+    const serialized = await ig.state.serialize();
+    delete serialized.constants;
+    const data = JSON.stringify(serialized);
+    fileHandler.saveFile(data);
+});
 
-async function CheckInstaSession() {
-    try {
-        ig.state.generateDevice(account.USERNAME);
-        if (fs.existsSync('cookies/' + account.USERNAME + '.json')) {
-            let data = fs.readFileSync('cookies/' + account.USERNAME + '.json', { encoding: 'utf-8' });
-            ig.request.setHeaders(JSON.parse(data), account.USERNAME);
+async function tryLoadSession() {
+    if (await fileHandler.existFile()) {
+        try {
+            await ig.state.deserialize(await fileHandler.loadFile());
+            await ig.account.currentUser();
             return true;
-        } else {
-           console.log('not exists');
-            await ig.account.login(account.USERNAME, account.PASSWORD);
-            let data = ig.request.getDefaultHeaders();
-            fs.writeFileSync('cookies/' + account.USERNAME + '.json', JSON.stringify(data), { encoding: 'utf-8' });
-            return true;
+        } catch (e) {
+            return false;
         }
-    } catch (e) {
-        console.log(e);
     }
-    return true;
+    return false;
 }
-
-
-
