@@ -22,11 +22,7 @@ const fetchUserDataModule = async function fetchUserDataMainFunction(req, res, i
         );
         return searchedUsers;
 
-    } catch (e) {
-        console.log(e);
-        if(e.message.includes('login_required')){
-            fs.unlinkSync('cookies/' + account.USERNAME + '.json');
-        }
+    } catch (e) {        
         var data = {
             error: true,
             message: 'Instagram account not Found',
