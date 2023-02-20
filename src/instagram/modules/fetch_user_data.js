@@ -22,7 +22,8 @@ const fetchUserDataModule = async function fetchUserDataMainFunction(req, res, i
         );
         return searchedUsers;
 
-    } catch (e) {        
+    } catch (e) { 
+               
         var data = {
             error: true,
             message: 'Instagram account not Found',
