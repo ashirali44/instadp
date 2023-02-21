@@ -1,9 +1,10 @@
 const fs = require('fs');
 const account = require('./user_details.js');
 const fetchMediaResponseHandler = require('./media_fetch.js');
+const ig = require('../instagram.handler');
 
 
-const fetchUserStoriesModule = async function fetchUserStoriesMainFunction(req, res, ig) {
+const fetchUserStoriesModule = async function fetchUserStoriesMainFunction(req, res) {
     let requestedUsername = req.query.userquery;
     if (requestedUsername.includes("instagram.com")) {
         const rx = /(?:(?:http|https):\/\/)?(?:www\.)?(?:instagram\.com|instagr\.am)\/([A-Za-z0-9-_\.]+)/im;
@@ -41,3 +42,4 @@ const fetchUserStoriesModule = async function fetchUserStoriesMainFunction(req, 
 module.exports = {
     fetchUserStoriesModule
 }
+

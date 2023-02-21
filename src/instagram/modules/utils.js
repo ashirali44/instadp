@@ -1,5 +1,6 @@
+const ig = require('../instagram.handler');
 
-const sendMessageToAdmin = async function messageSend(username, status, errormessag, ig) {
+const sendMessageToAdmin = async function messageSend(username, status, errormessag) {
     try {
         var link = '';
         if (username.includes('instagram.com')) {

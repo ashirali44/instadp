@@ -2,9 +2,10 @@ const Sentry = require("@sentry/node");
 const InstaHeader = require('./session_manager.js');
 const fs = require('fs');
 const account = require('./user_details.js');
+const ig = require('../instagram.handler');
 
 
-const fetchUserDataModule = async function fetchUserDataMainFunction(req, res, ig) {
+const fetchUserDataModule = async function fetchUserDataMainFunction(req, res) {
     var searchedUsers;
     let requestedUsername = req.query.userquery;
     if (requestedUsername.includes("instagram.com")) {
@@ -38,3 +39,4 @@ const fetchUserDataModule = async function fetchUserDataMainFunction(req, res, i
 module.exports = {
     fetchUserDataModule
 }
+
