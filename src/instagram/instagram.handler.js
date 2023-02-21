@@ -7,7 +7,12 @@ const fetchMediaResponseHandler = require('./modules/media_fetch');
 const fileHandler = require('./modules/validate.js');
 const ig = new IgApiClient();
 const urlHandlerInstagram = require('instagram-id-to-url-segment');
+const Sentry = require("@sentry/node");
 
+Sentry.init({
+    dsn: "https://edaf4f9d4e7042749a48db53e3838505@o4504420502732800.ingest.sentry.io/4504420506271744",
+    tracesSampleRate: 1.0,
+});
 
 
 exports.fetch = async function (req, res) {
