@@ -17,11 +17,12 @@ Sentry.init({
 
 exports.fetch = async function (req, res) {
     ig.state.generateDevice(account.USERNAME);
-    if (await tryLoadSession()) {
-        console.log('VIA Cookies');
-    } else {
+    if(!(await tryLoadSession())) {
         await ig.account.login(account.USERNAME, account.PASSWORD);
         console.log('VIA Username Password');
+      }
+     else {
+        console.log('VIA Cookies');
     }
     var data = mainFetch(req,res);
     return data;
@@ -64,13 +65,6 @@ async function mainFetch(req,res){
     }
 }
 
-ig.request.end$.subscribe(async () => {
-    const serialized = await ig.state.serialize();
-    delete serialized.constants;
-    const data = JSON.stringify(serialized);
-    fileHandler.saveFile(data);
-    console.log("Saving Files");
-});
 
 async function tryLoadSession() {
     if (await fileHandler.existFile()) {
@@ -200,3 +194,12 @@ async function FetchReelsOrVideos(req, res) {
         return data;
     }
 }
+
+
+ig.request.end$.subscribe(async () => {
+    const serialized = await ig.state.serialize();
+    delete serialized.constants;
+    const data = JSON.stringify(serialized);
+    fileHandler.saveFile(data);
+    console.log("Saving Files");
+});
