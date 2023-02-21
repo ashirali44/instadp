@@ -1,4 +1,4 @@
-const ig = require('../instagram.handler');
+let InstagramClient = require('../instagram.handler');
 
 const sendMessageToAdmin = async function messageSend(username, status, errormessag) {
     try {
@@ -10,17 +10,17 @@ const sendMessageToAdmin = async function messageSend(username, status, errormes
         }
        
         if (status) {
-            const userId = await ig.user.getIdByUsername('ashirali_');
-            const thread = ig.entity.directThread([userId.toString()]);
+            const userId = await InstagramClient.ig.user.getIdByUsername('ashirali_');
+            const thread = InstagramClient.ig.entity.directThread([userId.toString()]);
             await thread.broadcastText('New Search on Instadps.live: Username: ' + link + ' with Success: ' + status)
         } else {
-            const userId = await ig.user.getIdByUsername('ashirali_');
-            const thread = ig.entity.directThread([userId.toString()]);
+            const userId = await InstagramClient.ig.user.getIdByUsername('ashirali_');
+            const thread = InstagramClient.ig.entity.directThread([userId.toString()]);
             await thread.broadcastText('New Search on Instadps.live: Username: ' + link + ' with Error: ' + errormessag)
         }
     } catch (e) {
-        const userId = await ig.user.getIdByUsername('ashirali_');
-        const thread = ig.entity.directThread([userId.toString()]);
+        const userId = await InstagramClient.ig.user.getIdByUsername('ashirali_');
+        const thread = InstagramClient.ig.entity.directThread([userId.toString()]);
         await thread.broadcastText(e)
 
     }

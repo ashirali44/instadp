@@ -2,7 +2,6 @@ const Sentry = require("@sentry/node");
 const InstaHeader = require('./session_manager.js');
 const fs = require('fs');
 const account = require('./user_details.js');
-const ig = require('../instagram.handler');
 
 
 const fetchUserDataModule = async function fetchUserDataMainFunction(req, res) {
