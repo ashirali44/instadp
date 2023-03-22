@@ -12,6 +12,7 @@ const fetchMediaResponse = function fetchMedia(apiData) {
         tempData.duration = data['video_duration'];
         tempData.url = data['video_versions'][0].url;
         tempData.thumbnail = data['image_versions2'].candidates[0].url;
+
     } else {
         var image_urls = [];
         if (data['carousel_media'] && data['carousel_media'].length > 0) {
