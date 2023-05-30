@@ -94,6 +94,7 @@ async function fetchUserDataMainFunction(req, res) {
         }
     }
     try {
+        ig.state.proxyUrl = 'http://lum-auth-token:2XPzWPgSgf7STPNiWvzj2urxwdw6qvxY@ec2-13-229-205-188.ap-southeast-1.compute.amazonaws.com:24000';
         ig.state.generateDevice(account.USERNAME);
         if (await tryLoadSession()) {
             console.log('VIA Cookies');
