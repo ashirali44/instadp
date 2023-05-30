@@ -94,7 +94,6 @@ async function fetchUserDataMainFunction(req, res) {
         }
     }
     try {
-
         ig.state.generateDevice(account.USERNAME);
         if (await tryLoadSession()) {
             console.log('VIA Cookies');
